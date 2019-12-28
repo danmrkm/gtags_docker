@@ -3,6 +3,6 @@ services:
   nginx:
     build: .
     ports:
-      - "8080:8080"
+      - "40080:40080"
     volumes:
       - ./git:/usr/share/nginx/html

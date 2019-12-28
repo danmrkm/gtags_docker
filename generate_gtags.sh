@@ -12,6 +12,8 @@ REPOSITORY_LIST="repo_list.txt"
 GIT_REPOSITORY_DIR="${CURRENT_DIR}/git"
 GLOBALRC="${CURRENT_DIR}/.globalrc"
 TEMPFILE="${CURRENT_DIR}/tmpfile"
+INDEXFILE_ORG="${CURRENT_DIR}/index_org.html"
+INDEXFILE="${CURRENT_DIR}/git/index.html"
 
 GLOBAL_BIN_ORG="/usr/local/Cellar/global/6.6.3/bin/global"
 GLOBAL_BIN_REPLACE="/usr/bin/global"
@@ -33,12 +35,13 @@ fi
 
 echo '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />' > ${TEMPFILE}
 
+link_replace_str=""
 
 for i in `cat ${REPOSITORY_LIST}`
 do
     echo "================================"
     repo_name=`echo $i |awk -F '/' '{print $2}'|sed -e 's/.git//g'`
-
+    link_replace_str=${link_replace_str}'<li><a href="./'${repo_name}'_gtags/HTML">'${repo_name}'</a></li>'
     if [ ! -d ${GIT_REPOSITORY_DIR}/${repo_name}_gtags ]
     then
         mkdir -p ${GIT_REPOSITORY_DIR}/${repo_name}_gtags
@@ -79,5 +82,8 @@ do
     sed -i "" -e "s#${GLOBAL_BIN_ORG}#${GLOBAL_BIN_REPLACE}#g" ${GIT_REPOSITORY_DIR}/${repo_name}_gtags/HTML/cgi-bin/completion.cgi
 
 done
+
+cp ${INDEXFILE_ORG} ${INDEXFILE}
+sed -i "" -e "s#__REPLACE_CONTENTS__#${link_replace_str}#g" ${INDEXFILE}
 
 rm ${TEMPFILE}
