@@ -14,6 +14,7 @@ GLOBALRC="${CURRENT_DIR}/.globalrc"
 TEMPFILE="${CURRENT_DIR}/tmpfile"
 INDEXFILE_ORG="${CURRENT_DIR}/index_org.html"
 INDEXFILE="${CURRENT_DIR}/git/index.html"
+CSSFILE="${CURRENT_DIR}/style.css"
 
 GLOBAL_BIN_ORG="/usr/local/Cellar/global/6.6.3/bin/global"
 GLOBAL_BIN_REPLACE="/usr/bin/global"
@@ -75,12 +76,15 @@ do
     # HTAGS の実行
     htags -asnFof  --auto-completion --item-order csfd --html-header ${TEMPFILE} ${GTAGS_ADDITIONAL_OPTION}
 
+
+
     cd ${GIT_REPOSITORY_DIR}/
 
     # Global 実行ファイルのリプレイス
     sed -i "" -e "s#${GLOBAL_BIN_ORG}#${GLOBAL_BIN_REPLACE}#g"  ${GIT_REPOSITORY_DIR}/${repo_name}_gtags/HTML/cgi-bin/global.cgi
     sed -i "" -e "s#${GLOBAL_BIN_ORG}#${GLOBAL_BIN_REPLACE}#g" ${GIT_REPOSITORY_DIR}/${repo_name}_gtags/HTML/cgi-bin/completion.cgi
 
+    cp ${CSSFILE}  ${GIT_REPOSITORY_DIR}/${repo_name}_gtags/HTML/
 done
 
 cp ${INDEXFILE_ORG} ${INDEXFILE}
