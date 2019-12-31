@@ -14,6 +14,8 @@ GLOBALRC="${CURRENT_DIR}/.globalrc"
 TEMPFILE="${CURRENT_DIR}/tmpfile"
 INDEXFILE_ORG="${CURRENT_DIR}/index_org.html"
 INDEXFILE="${CURRENT_DIR}/git/index.html"
+INDEXCSSFILE_ORG="${CURRENT_DIR}/index_style.css"
+INDEXCSSFILE="${CURRENT_DIR}/git/index_style.css"
 CSSFILE="${CURRENT_DIR}/style.css"
 
 GLOBAL_BIN_ORG="/usr/local/Cellar/global/6.6.3/bin/global"
@@ -88,6 +90,7 @@ do
 done
 
 cp ${INDEXFILE_ORG} ${INDEXFILE}
+cp ${INDEXCSSFILE_ORG} ${INDEXCSSFILE}
 sed -i "" -e "s#__REPLACE_CONTENTS__#${link_replace_str}#g" ${INDEXFILE}
 
 rm ${TEMPFILE}
