@@ -13,10 +13,13 @@ GIT_REPOSITORY_DIR="${CURRENT_DIR}/git"
 GLOBALRC="${CURRENT_DIR}/.globalrc"
 TEMPFILE="${CURRENT_DIR}/tmpfile"
 INDEXFILE_ORG="${CURRENT_DIR}/index_org.html"
-INDEXFILE="${CURRENT_DIR}/git/index.html"
 INDEXCSSFILE_ORG="${CURRENT_DIR}/index_style.css"
-INDEXCSSFILE="${CURRENT_DIR}/git/index_style.css"
 CSSFILE="${CURRENT_DIR}/style.css"
+
+GTAGS_DIR="${CURRENT_DIR}/GTAGS"
+
+INDEXFILE="${GTAGS_DIR}/index.html"
+INDEXCSSFILE="${GTAGS_DIR}/index_style.css"
 
 GLOBAL_BIN_ORG="/usr/local/Cellar/global/6.6.3/bin/global"
 GLOBAL_BIN_REPLACE="/usr/bin/global"
@@ -44,13 +47,14 @@ for i in `cat ${REPOSITORY_LIST}`
 do
     echo "================================"
     repo_name=`echo $i |awk -F '/' '{print $2}'|sed -e 's/.git//g'`
-    link_replace_str=${link_replace_str}'<li><a href="./'${repo_name}'_gtags/HTML">'${repo_name}'</a></li>'
-    if [ ! -d ${GIT_REPOSITORY_DIR}/${repo_name}_gtags ]
+    link_replace_str=${link_replace_str}'<li><a href="./'${repo_name}'/HTML">'${repo_name}'</a></li>'
+
+    if [ ! -d ${GTAGS_DIR}/${repo_name} ]
     then
-        mkdir -p ${GIT_REPOSITORY_DIR}/${repo_name}_gtags
+        mkdir -p ${GTAGS_DIR}/${repo_name}
     fi
 
-    cd ${GIT_REPOSITORY_DIR}/${repo_name}_gtags
+    cd ${GIT_REPOSITORY_DIR}/
 
     echo ${repo_name}
 
@@ -67,26 +71,21 @@ do
     echo "Git pull..."
     git pull -f
 
-    cd ../
-
-
     echo "Run GTAGS..."
     # GTAGS の実行
-    gtags ${GTAGS_ADDITIONAL_OPTION}
+    gtags ${GTAGS_ADDITIONAL_OPTION} ${GTAGS_DIR}/${repo_name}
 
     echo "Run HTAGS..."
     # HTAGS の実行
-    htags -asnFof  --auto-completion --item-order csfd --html-header ${TEMPFILE} ${GTAGS_ADDITIONAL_OPTION}
-
-
+    htags -asnFof  --auto-completion --item-order csfd --html-header ${TEMPFILE} ${GTAGS_ADDITIONAL_OPTION} -d ${GTAGS_DIR}/${repo_name} ${GTAGS_DIR}/${repo_name}
 
     cd ${GIT_REPOSITORY_DIR}/
 
     # Global 実行ファイルのリプレイス
-    sed -i "" -e "s#${GLOBAL_BIN_ORG}#${GLOBAL_BIN_REPLACE}#g"  ${GIT_REPOSITORY_DIR}/${repo_name}_gtags/HTML/cgi-bin/global.cgi
-    sed -i "" -e "s#${GLOBAL_BIN_ORG}#${GLOBAL_BIN_REPLACE}#g" ${GIT_REPOSITORY_DIR}/${repo_name}_gtags/HTML/cgi-bin/completion.cgi
+    sed -i "" -e "s#${GLOBAL_BIN_ORG}#${GLOBAL_BIN_REPLACE}#g"  ${GTAGS_DIR}/${repo_name}/HTML/cgi-bin/global.cgi
+    sed -i "" -e "s#${GLOBAL_BIN_ORG}#${GLOBAL_BIN_REPLACE}#g" ${GTAGS_DIR}/${repo_name}/HTML/cgi-bin/completion.cgi
 
-    cp ${CSSFILE}  ${GIT_REPOSITORY_DIR}/${repo_name}_gtags/HTML/
+    cp ${CSSFILE}  ${GTAGS_DIR}/${repo_name}/HTML/
 done
 
 cp ${INDEXFILE_ORG} ${INDEXFILE}
