@@ -16,10 +16,8 @@ INDEXFILE_ORG="${CURRENT_DIR}/index_org.html"
 INDEXCSSFILE_ORG="${CURRENT_DIR}/index_style.css"
 CSSFILE="${CURRENT_DIR}/style.css"
 
-GTAGS_DIR="${CURRENT_DIR}/GTAGS"
-
-INDEXFILE="${GTAGS_DIR}/index.html"
-INDEXCSSFILE="${GTAGS_DIR}/index_style.css"
+INDEXFILE="${GIT_REPOSITORY_DIR}/index.html"
+INDEXCSSFILE="${GIT_REPOSITORY_DIR}/index_style.css"
 
 GLOBAL_BIN_ORG="/usr/local/Cellar/global/6.6.3/bin/global"
 GLOBAL_BIN_REPLACE="/usr/bin/global"
@@ -47,14 +45,15 @@ for i in `cat ${REPOSITORY_LIST}`
 do
     echo "================================"
     repo_name=`echo $i |awk -F '/' '{print $2}'|sed -e 's/.git//g'`
+
     link_replace_str=${link_replace_str}'<li><a href="./'${repo_name}'/HTML">'${repo_name}'</a></li>'
 
-    if [ ! -d ${GTAGS_DIR}/${repo_name} ]
+    if [ ! -d ${GIT_REPOSITORY_DIR}/${repo_name} ]
     then
-        mkdir -p ${GTAGS_DIR}/${repo_name}
+        mkdir -p ${GIT_REPOSITORY_DIR}/${repo_name}
     fi
 
-    cd ${GIT_REPOSITORY_DIR}/
+    cd ${GIT_REPOSITORY_DIR}/${repo_name}
 
     echo ${repo_name}
 
@@ -72,20 +71,23 @@ do
     git pull -f
 
     echo "Run GTAGS..."
+
+    cd ../
+
     # GTAGS の実行
-    gtags ${GTAGS_ADDITIONAL_OPTION} ${GTAGS_DIR}/${repo_name}
+    gtags ${GTAGS_ADDITIONAL_OPTION}
 
     echo "Run HTAGS..."
     # HTAGS の実行
-    htags -asnFof  --auto-completion --item-order csfd --html-header ${TEMPFILE} ${GTAGS_ADDITIONAL_OPTION} -d ${GTAGS_DIR}/${repo_name} ${GTAGS_DIR}/${repo_name}
+    htags -asnFof  --auto-completion --item-order csfd --html-header ${TEMPFILE} ${GTAGS_ADDITIONAL_OPTION}
 
-    cd ${GIT_REPOSITORY_DIR}/
+    cd ${GIT_REPOSITORY_DIR}
 
     # Global 実行ファイルのリプレイス
-    sed -i "" -e "s#${GLOBAL_BIN_ORG}#${GLOBAL_BIN_REPLACE}#g"  ${GTAGS_DIR}/${repo_name}/HTML/cgi-bin/global.cgi
-    sed -i "" -e "s#${GLOBAL_BIN_ORG}#${GLOBAL_BIN_REPLACE}#g" ${GTAGS_DIR}/${repo_name}/HTML/cgi-bin/completion.cgi
+    sed -i "" -e "s#${GLOBAL_BIN_ORG}#${GLOBAL_BIN_REPLACE}#g"  ./${repo_name}/HTML/cgi-bin/global.cgi
+    sed -i "" -e "s#${GLOBAL_BIN_ORG}#${GLOBAL_BIN_REPLACE}#g" ./${repo_name}/HTML/cgi-bin/completion.cgi
 
-    cp ${CSSFILE}  ${GTAGS_DIR}/${repo_name}/HTML/
+    cp ${CSSFILE}  ./${repo_name}/HTML/
 done
 
 cp ${INDEXFILE_ORG} ${INDEXFILE}

@@ -5,4 +5,4 @@ services:
     ports:
       - "40080:40080"
     volumes:
-      - ./GTAGS:/usr/share/nginx/html
+      - ./git:/usr/share/nginx/html
